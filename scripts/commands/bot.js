@@ -1,33 +1,39 @@
 module.exports.config = {
-  name: "mim",
-  version: "0.0.2",
-  permission: 0,
-  prefix: false,
-  credits: "Nayan",
-  description: "sad video",
-  category: "admin",
-  usages: "",
-    cooldowns: 5,
+    name: "mim",
+    version: "1.0.0",
+    hasPermssion: 0,
+    credits: "KENLIEPLAYS",
+    description: "Talk to sim",
+    commandCategory: "sim",
+    usages: "[ask]",
+    cooldowns: 2,
 };
 
-
-
-
-
 module.exports.run = async function({ api, event, args }) {
-    const axios = require("axios")
-    const request = require("request")
-    const fs = require("fs-extra")
-    const prompt = args.join(" ");
-    if (!prompt) return api.sendMessage(`হুম বেবি বলো💋😘`, event.threadID, event.messageID);
-    const res = await axios.get(`https://simsimi.fun/api/v2/?mode=talk&lang=bn&message=${content}&filter=true`);
-  console.log(res.data)
-  
-    const response = res.data.data.msg;
-
-
-        return api.sendMessage({
-            body: response
-
-        }, event.threadID, event.messageID);
+    const axios = require("axios");
+    let { messageID, threadID, senderID, body } = event;
+    let tid = threadID,
+    mid = messageID;
+    const content = encodeURIComponent(args.join(" "));
+    if (!args[0]) return api.sendMessage("JiiðŸ«£...", tid, mid);
+    try {
+        const res = await axios.get(`https://simsimi.fun/api/v2/?mode=talk&lang=bn&message=${content}&filter=true`);
+        const respond = res.data.success;
+        if (res.data.error) {
+            api.sendMessage(`Error: ${res.data.error}`, tid, (error, info) => {
+                if (error) {
+                    console.error(error);
+                }
+            }, mid);
+        } else {
+            api.sendMessage(respond, tid, (error, info) => {
+                if (error) {
+                    console.error(error);
+                }
+            }, mid);
+        }
+    } catch (error) {
+        console.error(error);
+        api.sendMessage("An error occurred while fetching the data.", tid, mid);
     }
+};
